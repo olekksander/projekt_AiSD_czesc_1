@@ -1,36 +1,36 @@
 import time
 import random
-import tabulate
+import pandas as pd
 
 def selection_sort(arr):
     n = len(arr)
-    for i in range(n):
-        min_index = i
-        for j in range(i+1, n):
-            if arr[j] < arr[min_index]:
-                min_index = j
-        arr[i], arr[min_index] = arr[min_index], arr[i]
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
 
 def bubble_sort(arr):
     n = len(arr)
     for i in range(n):
-        for j in range(0, n-i-1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
 
-def bubble_sort_flag(arr):
+def optimized_bubble_sort(arr):
     n = len(arr)
-    swapped = True
-    while swapped:
+    for i in range(n):
         swapped = False
-        for i in range(1, n):
-            if arr[i-1] > arr[i]:
-                arr[i-1], arr[i] = arr[i], arr[i-1]
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
                 swapped = True
+        if not swapped:
+            break
 
 def insertion_sort(arr):
-    n = len(arr)
-    for i in range(1, n):
+    for i in range(1, len(arr)):
         key = arr[i]
         j = i - 1
         while j >= 0 and key < arr[j]:
@@ -38,43 +38,51 @@ def insertion_sort(arr):
             j -= 1
         arr[j + 1] = key
 
-def measure_time(sort_func, data):
+def measure_time_sorting(method, data):
     start_time = time.time()
-    sort_func(data)
+    method(data)
     end_time = time.time()
     return end_time - start_time
 
-def run_tests(size):
-    random_data = [random.randint(1, 1000) for _ in range(size)]
-    ascending_data = list(range(1, size + 1))
-    descending_data = list(range(size, 0, -1))
+def run_experiment(data_generator, method_names):
+    sizes = list(range(10, 1001, 10))
+    results = {"Data Size": sizes}
 
-    results = []
-
-    for data, label in zip([random_data, ascending_data, descending_data], ['Random', 'Ascending', 'Descending']):
-        row = [label]
-        for sort_func, sort_label in zip([selection_sort, bubble_sort, bubble_sort_flag, insertion_sort],
-                                        ['Selection', 'Bubble', 'Bubble with Flag', 'Insertion']):
-            sorted_data = data.copy()
-            elapsed_time = measure_time(sort_func, sorted_data)
-            row.append(round(elapsed_time, 6))
-        results.append(row)
+    for method_name in method_names:
+        method_results = []
+        for size in sizes:
+            data = data_generator(size)
+            time_taken = measure_time_sorting(eval(method_name), data.copy())
+            method_results.append(time_taken)
+        results[method_name] = method_results
 
     return results
 
-def print_results(results):
-    headers = ['Input Type', 'Selection Sort', 'Bubble Sort', 'Bubble Sort (Flag)', 'Insertion Sort']
-    print(tabulate.tabulate(results, headers, tablefmt="grid"))
+def random_data(size):
+    return [random.randint(1, 1000) for _ in range(size)]
 
-def main():
-    sizes = list(range(1000, 100001, 1000))
-    all_results = []
+def ascending_data(size):
+    return list(range(1, size + 1))
 
-    for size in sizes:
-        results = run_tests(size)
-        all_results.extend(results)
-
-    print_results(all_results)
+def descending_data(size):
+    return list(range(size, 0, -1))
 
 if __name__ == "__main__":
-    main()
+    method_names = ["selection_sort", "bubble_sort", "optimized_bubble_sort", "insertion_sort"]
+
+    random_results = run_experiment(random_data, method_names)
+    ascending_results = run_experiment(ascending_data, method_names)
+    descending_results = run_experiment(descending_data, method_names)
+
+    random_df = pd.DataFrame(random_results)
+    ascending_df = pd.DataFrame(ascending_results)
+    descending_df = pd.DataFrame(descending_results)
+
+    print("Random Data:")
+    print(random_df)
+
+    print("\nAscending Data:")
+    print(ascending_df)
+
+    print("\nDescending Data:")
+    print(descending_df)
