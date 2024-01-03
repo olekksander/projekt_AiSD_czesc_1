@@ -67,6 +67,10 @@ def ascending_data(size):
 def descending_data(size):
     return list(range(size, 0, -1))
 
+def save_to_excel(results, filename):
+    df = pd.DataFrame(results)
+    df.to_excel(filename, index=False)
+
 if __name__ == "__main__":
     method_names = ["selection_sort", "bubble_sort", "optimized_bubble_sort", "insertion_sort"]
 
@@ -74,15 +78,8 @@ if __name__ == "__main__":
     ascending_results = run_experiment(ascending_data, method_names)
     descending_results = run_experiment(descending_data, method_names)
 
-    random_df = pd.DataFrame(random_results)
-    ascending_df = pd.DataFrame(ascending_results)
-    descending_df = pd.DataFrame(descending_results)
+    save_to_excel(random_results, "random_results.xlsx")
+    save_to_excel(ascending_results, "ascending_results.xlsx")
+    save_to_excel(descending_results, "descending_results.xlsx")
 
-    print("Random Data:")
-    print(random_df)
-
-    print("\nAscending Data:")
-    print(ascending_df)
-
-    print("\nDescending Data:")
-    print(descending_df)
+    print("Results saved to Excel files.")
