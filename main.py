@@ -44,8 +44,8 @@ def measure_time_sorting(method, data):
     end_time = time.time()
     return end_time - start_time
 
-def run_experiment(data_generator, method_names):
-    sizes = list(range(10, 1001, 10))
+def run_experiment(data_generator, method_names, display_progress=True):
+    sizes = list(range(1000, 100001, 1000))
     results = {"Data Size": sizes}
 
     for method_name in method_names:
@@ -54,6 +54,10 @@ def run_experiment(data_generator, method_names):
             data = data_generator(size)
             time_taken = measure_time_sorting(eval(method_name), data.copy())
             method_results.append(time_taken)
+
+            # Wyświetlanie postępu po każdych 1000 sortowaniach
+            if display_progress and size % 1000 == 0:
+                print(f"Method: {method_name}, Data Size: {size}, Time: {time_taken:.6f} seconds")
         results[method_name] = method_results
 
     return results
