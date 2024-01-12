@@ -18,7 +18,7 @@ def bubble_sort(arr):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
 
-def optimized_bubble_sort(arr):
+def bubble_sort_flag(arr):
     n = len(arr)
     for i in range(n):
         swapped = False
